@@ -1,8 +1,10 @@
-import { Container, Input, SimpleGrid, Box, Heading, VStack, Image, Text } from "@chakra-ui/react";
+import { Container, Input, SimpleGrid, Box, Heading, VStack, Image, Text, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button } from "@chakra-ui/react";
 import { useState } from "react";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDoor, setSelectedDoor] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const doors = [
     { id: 1, name: "Victorian Door", image: "/images/victorian-door.jpg", description: "A beautiful Victorian-era door." },
@@ -14,6 +16,11 @@ const Index = () => {
   const filteredDoors = doors.filter(door =>
     door.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleDoorClick = (door) => {
+    setSelectedDoor(door);
+    onOpen();
+  };
 
   return (
     <Container maxW="container.xl" p={4}>
@@ -29,7 +36,7 @@ const Index = () => {
         />
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8} w="full">
           {filteredDoors.map(door => (
-            <Box key={door.id} borderWidth="1px" borderRadius="lg" overflow="hidden">
+            <Box key={door.id} borderWidth="1px" borderRadius="lg" overflow="hidden" onClick={() => handleDoorClick(door)} cursor="pointer">
               <Image src={door.image} alt={door.name} />
               <Box p={6}>
                 <Heading as="h3" size="lg">{door.name}</Heading>
@@ -38,6 +45,22 @@ const Index = () => {
             </Box>
           ))}
         </SimpleGrid>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>{selectedDoor?.name}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Image src={selectedDoor?.image} alt={selectedDoor?.name} mb={4} />
+              <Text>{selectedDoor?.description}</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={onClose}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </VStack>
     </Container>
   );
